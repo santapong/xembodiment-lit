@@ -1,5 +1,5 @@
 # X-Embodiment & Embodied AI — Research Survey
-Updated: 2026-08-25
+Updated: 2026-08-26
 
 ## 1. Foundation: Open X-Embodiment (arXiv:2310.08864, ICRA 2024)
 - Community dataset from 21 institutions: **1M+ trajectories, 22 embodiments, 60 source datasets, 34 labs**, standardized in RLDS (TFRecord) format. 527 skills / 160,266 tasks.
@@ -17,7 +17,7 @@ Updated: 2026-08-25
 ## 3. Newer Wave (2024–2026)
 - **DROID** (2403.12945, RSS'24): 76k demos / 350h, 564 scenes, 86 tasks, collected by 50 operators worldwide on Franka. Higher quality/diversity than OXE average; now standard pretraining supplement.
 - **π0** (Physical Intelligence, 2410.24164): PaliGemma-3B VLM + flow-matching action expert → smooth 50Hz continuous action chunks. Trained across 7 robot platforms / 68 tasks. State of the art for dexterous manipulation. Variant π0-FAST uses frequency-space action tokenization for faster training.
-- **GR00T N1** (NVIDIA, 2503.14734): open humanoid foundation model. Dual-system: VLM reasoning (System 2, 10Hz) + diffusion transformer flow-matching actions (System 1, 120Hz). Trained on data pyramid of real robot + human video + synthetic data (synthetic+real mix gave +40%). Deployed on Fourier GR-1. Later GR00T N1.x extends to bimanual/semi-humanoid.
+- **GR00T N1** (NVIDIA, 2503.14734): open humanoid foundation model. Dual-system: VLM reasoning (System 2, 10Hz) + diffusion transformer flow-matching actions (System 1, 120Hz). Trained on data pyramid of real robot + human video + synthetic data (co-training with neural trajectories gave **+4.2/+8.8/+6.8 pts** in sim at 30/100/300 demos and **+5.8 pts** on the real GR-1 — 2503.14734 §4.4; an earlier draft of this note said +40%, which the paper does not support). Deployed on Fourier GR-1. Later GR00T N1.x extends to bimanual/semi-humanoid.
 - **CogACT** (MSRA/Tsinghua, 2411.19650): componentized VLA — VLM cognition module + separate diffusion action transformer. Beats OpenVLA by >35% (sim) / 55% (real), beats 55B RT-2-X by 18% absolute in sim.
 - Field trend (per VLA surveys): lineage RT-1 → RT-2 → RT-2-X → OpenVLA → π0 → CogACT → SpatialVLA/X-VLA/Gemini Robotics/Helix. Pretraining = OXE + DROID (+ RoboMIND, human video). Evaluation migrated to LIBERO/CALVIN/SimplerEnv + real-world AutoEval/RoboArena.
 
@@ -30,3 +30,9 @@ Updated: 2026-08-25
 ## 5. Relevance to Santapong's interests
 - Language-guided robotics (ROS 2/MCP): OpenVLA and Octo checkpoints are runnable and finetunable; LeRobot (HF) ships π0 implementations.
 - RLDS format is the interchange standard; OXE colab notebooks allow browsing all datasets without full download (~1.2TB processed for Octo pretraining).
+
+## See also (deep dives added 2026-08-26)
+- `frontier-2025-26.md` — everything after the 10 anchor papers: π0-FAST/π0.5, OpenVLA-OFT, SmolVLA, Gemini Robotics, RDT-1B, GR-3, X-VLA, GR00T N1.x, Helix, and the mid-2026 wave.
+- `cross-embodiment-transfer.md` — how transfer is actually engineered (action alignment, embodiment adapters, latent actions, data mixtures) and the evidence for *and against* it.
+- `evaluation-and-failure.md` — benchmarks, statistical rigor, runtime failure detection, reactivity vs chunking, safety evals; the rigorous-eval checklist.
+- `finetune-own-arm.md` — practical recipe and budget for fine-tuning an open VLA on a single low-cost arm.
