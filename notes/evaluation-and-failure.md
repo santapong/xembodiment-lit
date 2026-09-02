@@ -45,6 +45,52 @@ Three compounding problems:
 | **Attention-entropy (visual-token addressing) / self-evaluation** | FabriMAE / MAE (2608.16697) | AUROC 59–86% depending on policy/subset; +test-time action-selection gain of +1.10pp success on LIBERO-Plus with <0.1× latency overhead | <0.1× overhead (reuses attention already computed) |
 | **Failure→correction offline RL** (not detection but recovery) | RedFlow (2607.27782) | +12.0pp avg success on LIBERO (56.2%→68.2%); real-robot 56.7%→74.7%; matches on-policy RL (PPO/GRPO/DDPO) with ~10-24× fewer rollouts | offline, one training pass; no runtime cost |
 
+### 4.1 SAFE's protocol, and the leakage control worth copying (2506.09937)
+
+Fetched in full 2026-09-03. SAFE is already in the table above for its ROC-AUC; what follows is
+its *protocol*, which is the more transferable part.
+
+**Setup.** Four policy x benchmark cells, two simulated and two real. LIBERO-10 with OpenVLA,
+π0-FAST and π0 on the authors' released checkpoints, no further fine-tuning; reported LIBERO-10
+success rates **OpenVLA 53.7%, π0-FAST 60.2%, π0 85.2%** (2506.09937, App. B.5). SimplerEnv with a
+π0 reproduction, trained and scored **separately per embodiment** (Google Robot and WidowX have
+different feature spaces), 4 tasks each at 100 rollouts; "pick up coke" is excluded because the
+policy succeeds 98% of the time and yields no failures to detect. A real Franka running
+π0-FAST-DROID over **13 tasks x (30 success + 30 failure)** rollouts. A real WidowX running OpenVLA
+over 8 tasks, **532 rollouts, 244 success / 288 failure**.
+
+**The split is the contribution.** The detector trains only on seen tasks and is scored on held-out
+ones: 3 of 10 on LIBERO, 1 of 4 per embodiment on SimplerEnv, 3 of 13 on the Franka. Within seen
+tasks, 60/40 (LIBERO) or 66/33 (SimplerEnv) train/calibration. Results average over **3 seeds** in
+simulation and **5** on real robots, each seed a different seen/unseen split.
+
+**The leakage control (2506.09937, App. B.5).** LIBERO terminates a rollout the moment the task
+succeeds, so every *failure* runs to the maximum length. A detector that did nothing but count
+elapsed time (s_t = t) would score a perfect ROC-AUC. The authors state this explicitly and fix it
+by truncating every rollout in a task to that task's **minimum** rollout length, so success and
+failure have identical duration before scoring. **This is the single most reusable idea in the
+paper for our purposes** — it is a duration confound that any LIBERO-based failure-detection result
+inherits silently, and most papers using LIBERO for this do not mention it.
+
+**Metrics.** Two layers. (1) Threshold-free: ROC-AUC on the **running maximum** score
+s̄_t = max_{τ≤t} s_τ evaluated at final T, because a success becomes a false positive if the score
+ever crosses the threshold. (2) Thresholded by functional conformal prediction calibrated on
+*successful seen-task* rollouts, giving a false-positive-rate guarantee of at most α: TPR, FPR,
+balanced accuracy, and **T-det**, the normalized first-crossing timestep averaged over ground-truth
+failures (T-det = 1 if never raised). Ground-truth failure timesteps are **hand-annotated** ("when a
+human thinks failure happens or intervention is needed"), so early detection is measured against
+when a person would have intervened, not against the end of the episode.
+
+**Baseline fairness, stated honestly.** STAC needs many action samples (its own paper uses 256;
+SAFE tests it at 10) and is therefore **simulation-only** here: generating 10 samples instead of 1
+costs **+152% latency for π0 and +221% for π0-FAST on a single RTX 3090**, which the authors judge
+impractical on a real robot. SAFE itself is 2.3M params and +0.73 ms, under 1% of π0's 149 ms.
+
+**Stated limitations.** Manipulation only; no cross-embodiment, sim-to-real, or action-less-video
+generalization tested; last-layer features only; and the detector still requires deploying the
+policy and collecting both successful and failed rollouts before it can detect anything — so it
+does not remove the data-collection cost, it amortizes it across tasks.
+
 ## 5. Reactivity vs. Action-Chunking
 
 Action chunking (predict k future actions per inference call) is now near-universal (ACT/ALOHA 2304.13705, π0, SmolVLA, GR00T). It fixes imitation-learning's compounding-error problem — ACT's own ablation shows success rate jumping from **1% at chunk size k=1 to 44% at k=100**, then slightly tapering as k→open-loop (2304.13705, §VI-A) — but at the direct cost of reactivity: mid-chunk, the robot is blind to new observations for k timesteps, and naively switching chunks at the boundary can cause visible strategy-mode jumps ("jerky, out-of-distribution" transitions).

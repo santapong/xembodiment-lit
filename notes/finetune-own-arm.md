@@ -176,6 +176,23 @@ capture list so that note has something to score.)
   reports an ID/OOD split (SmolVLA Table 4, GR00T N1 Table 5) and it is
   the cheapest way to get a generalization number, not just a fit number.
 
+## 6b. Data-strategy pointers (added 2026-09-03, not verified)
+
+Three papers on where robot data comes from arrived via an alphaXiv Assistant transcript and are
+filed in the alphaXiv folder *Data & simulation*. Ids confirmed to resolve; **contents not read**,
+so nothing here is a sourced claim.
+
+| Paper | arXiv | Why it is relevant to this recipe |
+|---|---|---|
+| Data Pyramid for Embodied Manipulation: A Survey | 2607.24744 | the layered strategy this note already applies informally: cheap broad data under a small high-quality task set. Read it before scaling the demo count |
+| Data Standards for Humanoid Robotics | 2606.19769 | whether physical experience can accumulate across robots and orgs at all |
+| 3D Generation for Embodied AI and Robotic Simulation | 2604.26509 | synthetic scene generation as a substitute for collecting more real demos |
+
+The augmentation result in `world-models.md` §3 is the one *verified* data point nearby, and it is
+narrow: style-transferred synthetic data bought robustness to held-out backgrounds and lighting, at
+a small in-distribution cost, using a 38B generator far outside this note's budget (2607.11643).
+Treat generated data as a robustness tool, not a way to collect fewer demonstrations.
+
 ## 7. Limitations
 
 - No paper in this set publishes a single, apples-to-apples GPU-hour

@@ -4,15 +4,17 @@ Research notes and verified references on embodied AI with the **Open X-Embodime
 
 ## Contents
 
-- `paper/references.bib` — 55 BibTeX entries, all fetched from arXiv metadata (the 10 anchors plus every paper cited in the deep dives)
+- `paper/references.bib` — 101 BibTeX entries, all fetched from arXiv metadata (the 10 anchors, every paper cited in the deep dives, and the 2026-09-03 transcript ingest)
 - `notes/survey.md` — field survey: OXE foundation → open generalist policies → newer wave (2024–2026), with key numbers and themes
 - `notes/openvla-deep-dive.md` — OpenVLA architecture, training data, results, efficiency methods, limitations
 - `notes/frontier-2025-26.md` — what came after the anchors: π0-FAST, π0.5, OpenVLA-OFT, SmolVLA, Gemini Robotics, RDT-1B, GR-3, X-VLA, GR00T N1.x, Helix, mid-2026 wave
 - `notes/cross-embodiment-transfer.md` — how cross-embodiment transfer is engineered, mechanism taxonomy, ablation evidence for and against
 - `notes/evaluation-and-failure.md` — benchmarks, statistical rigor, runtime failure detection, reactivity vs chunking, safety evals, rigorous-eval checklist
 - `notes/finetune-own-arm.md` — practical recipe + budget for fine-tuning an open VLA on one custom low-cost arm
+- `notes/world-models.md` — world models as planners and as data engines; three-axis taxonomy; the verified Xiaomi-U0 augmentation result and its caveats
+- `notes/humanoid-whole-body.md` — humanoid loco-manipulation: control stack, model-based vs learning scorecard, hardware limits, and why VLA is not yet the answer there
 
-**Reading order:** `survey.md` → `openvla-deep-dive.md` → `frontier-2025-26.md` → `cross-embodiment-transfer.md` → `evaluation-and-failure.md` → `finetune-own-arm.md`.
+**Reading order:** `survey.md` → `openvla-deep-dive.md` → `frontier-2025-26.md` → `cross-embodiment-transfer.md` → `evaluation-and-failure.md` → `finetune-own-arm.md`. Then `world-models.md` and `humanoid-whole-body.md`, which are newer and thinner: each has one paper read in full and the rest filed as an explicitly unverified reading map.
 
 Every number in the notes carries the arXiv id it was read from; claims that could not be verified against a fetched source are marked "not verified".
 
