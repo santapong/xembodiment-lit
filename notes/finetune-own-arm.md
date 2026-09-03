@@ -193,6 +193,28 @@ narrow: style-transferred synthetic data bought robustness to held-out backgroun
 a small in-distribution cost, using a 38B generator far outside this note's budget (2607.11643).
 Treat generated data as a robustness tool, not a way to collect fewer demonstrations.
 
+## 6c. Scripted-expert data for a sim bed (read 2026-09-03, verified)
+
+Read in full through alphaXiv for the UR5e sim bed in `RoboLLM/sim/vla-bed` (its SDD §14 carries
+the same rules with section pointers). Numbers are the papers' own, with protocol.
+
+| Rule | Paper | Protocol and number |
+|---|---|---|
+| **Delta actions over absolute; chunk-wise deltas over step-wise; shorter execution horizon for delta** | 2602.23408 (Feng et al., Tsinghua AIR) | 13,000+ real rollouts, 500+ trained models, 6×6 grid of initial conditions, 3 trials × 10 rollouts per cell. Table 1 overall avg: abs-EE **63.4** → delta-EE **78.4** (ACT), **71.9** → **82.9** (DP). Delta peaks at execution horizon k=30, absolute at k=60 (30 Hz). Task space wins in cross-embodiment and π0-transfer regimes; joint space wins with abundant single-robot data |
+| **Gripper-frame (EEF-delta) actions and states transfer better than base-frame** | 2609.02546 (ZETA, Galbot/PKU) | 6,300 sim rollouts per model (3 tasks × 7 held-out embodiments × 100 × 3 runs) + 140 real. Table 3 sim avg World-Delta **60.3** → EEF-Delta **64.6** (abs state), **73.4** → **75.7** (EEF-delta state); Table 4 real **56.0** → **61.6** → **89.9**; arm-only shift **38.5** → **69.8** with EEF-delta state. Also: report strict vs pretrain-exposed zero-shot separately; 5 % target-embodiment data in pretraining = +13.4 points |
+| **Execute noisy, record the clean label; mix clean and noisy; isotropic noise; level matters** | 1703.09327 (DART), 2507.09061 (Zhang, Pfrommer, Pan, Matni, Simchowitz) | DART Alg. 1 stores (x, π*(x)) while executing noisy; Fig. 5: Tr(Σ)=0.5 matches DART, 0.005 and 5.0 much worse; HSR grasping in clutter **49 % → 79 %** (α=3) but **72 %** at α=6 (20 trials per condition). Zhang et al.: "the expert's recorded action is uncorrupted", clean+noised mixture removes the additive σ penalty, "beneficial to use larger noise levels"; Thm 1: the *executed* chunk length is what prevents exponential compounding, requisite lengths small |
+| Counter-evidence: random noise is not universally useful | 2508.03129 (MPC-SafeGIL) | Quadruped and F1Tenth navigation: Gaussian/uniform noise gave no gain, DART some, adversarial disturbance most (10 seeds, 20–100 rollouts). Noise recipes are task-dependent; measure, do not assume |
+| **Proprioceptive state: modest gains, joint vs EE state secondary, watch for the state shortcut** | 2608.03052 (HKUST-GZ) | π0.5 scaffold on RoboCasa365, 45 atomic tasks × 50 rollouts, 20 composite × 25. Discrete state prompt **+3.1** points (the only paired-bootstrap-CI-supported gain); K=8 history to the action head **+10.8** on composite; long raw histories hurt precision tasks. No real-robot validation |
+| **Report safety separately: (SR, Safety, SBU, VSI), Wilson CIs, fixed seeds** | 2606.00773 (SafeVLA-Bench) | LIBERO n=200 per model-suite cell, RoboCasa-365 n=900. Policies at ≥94 % SR still leave **13–15 %** unsafe rollouts; **36–56 %** of RoboCasa successes violate an active clause; safety changes the ranking (π-RL-130 best Safety 90.3 % at lower SR). Simulator-only; force thresholds are proxies |
+| **Sim-and-real co-training: balanced mixing band, keep domain discernibility** | 2604.13645 (Lei, Liu, Maddukuri, Jiang, Zhu) | Diffusion policy, robosuite tasks, 50 real demos + ~3000 MimicGen; 200 sim trials × 3 checkpoints, 30 real trials. Best at w ∈ (0.016, 0.3); representation alignment explains ≈ 50 % of variance vs ≈ 20 % for the mixing ratio; CFG-ADDA (domain label + adversarial alignment) real avg **15.3/30 → 21/30** |
+
+Empty result: no paper measures a noise-injection recipe for a scripted *reaching* expert.
+The bed therefore records two σ levels and measures.
+
+**Practical notes.** Store base-frame deltas plus the full EE pose so gripper-frame and chunk-wise
+variants can be derived at training time without breaking OXE compatibility (`lerobot/berkeley_autolab_ur5`
+is base-frame). Record both the clean label and the executed action. Report the SafeVLA quadruple.
+
 ## 7. Limitations
 
 - No paper in this set publishes a single, apples-to-apples GPU-hour
