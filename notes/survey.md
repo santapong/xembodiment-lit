@@ -1,5 +1,5 @@
 # X-Embodiment & Embodied AI — Research Survey
-Updated: 2026-08-25
+Updated: 2026-08-26
 
 ## 1. Foundation: Open X-Embodiment (arXiv:2310.08864, ICRA 2024)
 - Community dataset from 21 institutions: **1M+ trajectories, 22 embodiments, 60 source datasets, 34 labs**, standardized in RLDS (TFRecord) format. 527 skills / 160,266 tasks.
@@ -17,7 +17,7 @@ Updated: 2026-08-25
 ## 3. Newer Wave (2024–2026)
 - **DROID** (2403.12945, RSS'24): 76k demos / 350h, 564 scenes, 86 tasks, collected by 50 operators worldwide on Franka. Higher quality/diversity than OXE average; now standard pretraining supplement.
 - **π0** (Physical Intelligence, 2410.24164): PaliGemma-3B VLM + flow-matching action expert → smooth 50Hz continuous action chunks. Trained across 7 robot platforms / 68 tasks. State of the art for dexterous manipulation. Variant π0-FAST uses frequency-space action tokenization for faster training.
-- **GR00T N1** (NVIDIA, 2503.14734): open humanoid foundation model. Dual-system: VLM reasoning (System 2, 10Hz) + diffusion transformer flow-matching actions (System 1, 120Hz). Trained on data pyramid of real robot + human video + synthetic data (synthetic+real mix gave +40%). Deployed on Fourier GR-1. Later GR00T N1.x extends to bimanual/semi-humanoid.
+- **GR00T N1** (NVIDIA, 2503.14734): open humanoid foundation model. Dual-system: VLM reasoning (System 2, 10Hz) + diffusion transformer flow-matching actions (System 1, 120Hz). Trained on data pyramid of real robot + human video + synthetic data (co-training with neural trajectories gave **+4.2/+8.8/+6.8 pts** in sim at 30/100/300 demos and **+5.8 pts** on the real GR-1 — 2503.14734 §4.4; an earlier draft of this note said +40%, which the paper does not support). Deployed on Fourier GR-1. Later GR00T N1.x extends to bimanual/semi-humanoid.
 - **CogACT** (MSRA/Tsinghua, 2411.19650): componentized VLA — VLM cognition module + separate diffusion action transformer. Beats OpenVLA by >35% (sim) / 55% (real), beats 55B RT-2-X by 18% absolute in sim.
 - Field trend (per VLA surveys): lineage RT-1 → RT-2 → RT-2-X → OpenVLA → π0 → CogACT → SpatialVLA/X-VLA/Gemini Robotics/Helix. Pretraining = OXE + DROID (+ RoboMIND, human video). Evaluation migrated to LIBERO/CALVIN/SimplerEnv + real-world AutoEval/RoboArena.
 
@@ -27,6 +27,58 @@ Updated: 2026-08-25
 3. **Data heterogeneity is the bottleneck**: embodiment-specific encoders/decoders (GR00T) and normalization schemes are how the field copes with OXE's heterogeneity.
 4. **Efficient adaptation is standard**: LoRA + quantization (OpenVLA) makes VLAs practical on consumer GPUs.
 
+## 4b. The Survey Layer Itself (added 2026-09-03)
+
+Eleven survey/tutorial papers arrived via an alphaXiv Assistant transcript and are filed in the
+alphaXiv folder *Surveys & field maps*. All eleven ids were confirmed to resolve on arXiv. **Only
+2509.19012 was fetched and read**; the rest are title/abstract only and must not be cited as sourced.
+
+**Pure VLA: A Comprehensive Survey (2509.19012)** — verified. Lanzhou University / NUS / CAS.
+Synthesizes **over three hundred recent studies** (2509.19012, Abstract; restated as "over 300
+articles" in §8). Organizes VLA by *action-generation strategy* into **autoregression-based,
+diffusion-based, reinforcement-based, hybrid, and specialized/efficient** methods. Covers datasets,
+benchmarks, simulation platforms and hardware. Its §7.1.5 independently reaches the same verdict as
+`evaluation-and-failure.md`: benchmarks sit in "laboratory or highly structured simulated
+environments," performance "degrades drastically" once deployed outdoors or in real homes, and "the
+lack of unified, authoritative, and diverse benchmarks is becoming a major bottleneck."
+
+Two defects in that survey, both found on reading it:
+- **It says "we classify VLA approaches into 4 categories" and then lists five** (2509.19012, §1).
+  Cosmetic, but a sign of how fast these surveys are assembled.
+- **It misstates Open X-Embodiment as "22 robot datasets from 21 institutions"** (2509.19012, §2.2).
+  The OXE paper says **22 embodiments** and **60 datasets** pooled from **34 labs**, with the
+  collaboration spanning 21 institutions (2310.08864, §III-A). The skills/tasks figures it quotes,
+  527 and 160,266, are correct. §1 of this note already has the right numbers — **prefer them over
+  any survey's restatement.**
+
+| Paper | arXiv | Read it for |
+|---|---|---|
+| Pure VLA: A Comprehensive Survey | 2509.19012 | **fetched** — best single VLA taxonomy + resources |
+| A Survey on VLA Models for Embodied AI | 2405.14093 | components / control policies / task planners split |
+| VLA Survey: An Action Tokenization Perspective | 2507.01925 | how continuous commands become discrete or latent actions |
+| VLA Models: Concepts, Progress, Applications, Challenges | 2505.04769 | broad intro, applications beyond manipulation |
+| Survey of VLA for Embodied Manipulation | 2508.15201 | manipulation-specific |
+| Embodied AI: From LLMs to World Models | 2509.20021 | the MLLM-vs-world-model division |
+| Large Model Empowered Embodied AI | 2508.10399 | foundation models for embodied decision-making |
+| Learning Embodied Intelligence from Physical Simulators and World Models | 2507.00917 | simulation and sim-to-real |
+| Robot Learning: A Tutorial | 2510.12403 | beginner-level map of robot learning |
+| Robotic Manipulation via Imitation Learning | 2508.17449 | IL taxonomy, evolution, benchmarks |
+| Multi-agent Embodied AI | 2505.05108 | cooperation and coordination across agents |
+
+**Reading order if starting cold:** 2510.12403 (tutorial) → 2405.14093 (VLA) → 2509.19012 (deep VLA
+taxonomy). Surveys date fast in this field; treat any survey number as a pointer to the primary
+paper, not as a fact.
+
 ## 5. Relevance to Santapong's interests
 - Language-guided robotics (ROS 2/MCP): OpenVLA and Octo checkpoints are runnable and finetunable; LeRobot (HF) ships π0 implementations.
 - RLDS format is the interchange standard; OXE colab notebooks allow browsing all datasets without full download (~1.2TB processed for Octo pretraining).
+
+## See also (deep dives added 2026-08-26)
+- `frontier-2025-26.md` — everything after the 10 anchor papers: π0-FAST/π0.5, OpenVLA-OFT, SmolVLA, Gemini Robotics, RDT-1B, GR-3, X-VLA, GR00T N1.x, Helix, and the mid-2026 wave.
+- `cross-embodiment-transfer.md` — how transfer is actually engineered (action alignment, embodiment adapters, latent actions, data mixtures) and the evidence for *and against* it.
+- `evaluation-and-failure.md` — benchmarks, statistical rigor, runtime failure detection, reactivity vs chunking, safety evals; the rigorous-eval checklist.
+- `finetune-own-arm.md` — practical recipe and budget for fine-tuning an open VLA on a single low-cost arm.
+
+## See also (added 2026-09-03)
+- `world-models.md` — world models as planners and as data engines; the three-axis taxonomy.
+- `humanoid-whole-body.md` — humanoid loco-manipulation: control stack, learning, mechanism, and why VLA is not yet the answer there.
