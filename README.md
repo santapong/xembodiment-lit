@@ -4,7 +4,9 @@ Research notes and verified references on embodied AI with the **Open X-Embodime
 
 ## Contents
 
-- `paper/references.bib` — 101 BibTeX entries, all fetched from arXiv metadata (the 10 anchors, every paper cited in the deep dives, and the 2026-09-03 transcript ingest)
+- `paper/references.bib` — 109 BibTeX entries: 108 arXiv records plus one
+  non-arXiv web reference (the anchors, papers cited in the deep dives, and the
+  2026-09-03 transcript ingest)
 - `notes/survey.md` — field survey: OXE foundation → open generalist policies → newer wave (2024–2026), with key numbers and themes
 - `notes/openvla-deep-dive.md` — OpenVLA architecture, training data, results, efficiency methods, limitations
 - `notes/frontier-2025-26.md` — what came after the anchors: π0-FAST, π0.5, OpenVLA-OFT, SmolVLA, Gemini Robotics, RDT-1B, GR-3, X-VLA, GR00T N1.x, Helix, mid-2026 wave
@@ -17,6 +19,19 @@ Research notes and verified references on embodied AI with the **Open X-Embodime
 **Reading order:** `survey.md` → `openvla-deep-dive.md` → `frontier-2025-26.md` → `cross-embodiment-transfer.md` → `evaluation-and-failure.md` → `finetune-own-arm.md`. Then `world-models.md` and `humanoid-whole-body.md`, which are newer and thinner: each has one paper read in full and the rest filed as an explicitly unverified reading map.
 
 Every number in the notes carries the arXiv id it was read from; claims that could not be verified against a fetched source are marked "not verified".
+
+## Validation
+
+The repository has no runtime dependencies. Validate the corpus with:
+
+```bash
+python3 scripts/validate_repository.py
+```
+
+The check rejects duplicate BibTeX keys and arXiv identifiers, incomplete
+arXiv records, stale note counts, and notes missing from this index. CI runs the
+same command on every push and pull request. See [MAINTENANCE.md](./MAINTENANCE.md)
+for the evidence states and update policy.
 
 ## Quick Facts
 
