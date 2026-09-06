@@ -238,9 +238,19 @@ What the bed measured against them (identical 100-seed suite, paired):
   0.03 / 0.04 / 0.06, all p ≥ 0.5) — the perturbation family must match, and it does not extrapolate.
 - Nominal success stayed inside ±8 points across all three recipes: viewpoint diversity is not a precision lever.
 - Tolerance sweeps (§3b of `evaluation-and-failure.md`) show the failures are centimetre misses, which puts the
-  remaining levers where 2607.23108 puts them: expert clarity (less injected noise — recipe v5a, 0.25 × noise,
-  in progress), a wrist camera (recipe v6), and a DAgger round with the privileged oracle (v7). RL post-training
-  (Z-1) is out of the $0 budget: ≈ 30 s per rollout on a T4 makes one GRPO round ≈ 10 Kaggle sessions.
+  remaining levers where 2607.23108 puts them: expert clarity (less injected noise — recipe v5a), a wrist
+  camera (recipe v6), and a DAgger round with the privileged oracle (v7). RL post-training (Z-1) is out of
+  the $0 budget: ≈ 30 s per rollout on a T4 makes one GRPO round ≈ 10 Kaggle sessions.
+- **Halving the injected expert noise (0.5 × → 0.25 × the per-step limit, recipe v5a, 6 Sep 2026) did not
+  move nominal success**: 0.11 / 0.09 / 0.16 / 0.10 over the four checkpoints against 0.07 / 0.13 / 0.09 / 0.09
+  for the same recipe at 0.5 ×, every paired difference inside the noise (+0.04, −0.04, +0.07, +0.01; McNemar
+  p 0.19–1), best-vs-best −0.04 [−0.14, +0.06]. The 2606.20871 prediction (less trajectory diversity → higher
+  success for a fine-tuned VLA) is therefore **not confirmed at n = 100** — not refuted either: the paper's
+  monotone-harm curve is over its own shape-entropy measure, and a 2 × change in Gaussian DART noise may sit
+  inside one of its bins. The clean-label recipe (noise 0) was not recorded on that basis. The same run gave
+  the best score under the shifted test camera (0.21 vs 0.13 at 0.5 × noise, +0.08 [0.00, +0.16], p = 0.077;
+  vs the azimuth-only recipe +0.16 [+0.08, +0.24], p = 0.0004), an effect the nominal suite alone would have
+  missed.
 
 ## 7. Limitations
 

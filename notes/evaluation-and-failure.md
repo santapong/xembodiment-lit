@@ -58,6 +58,12 @@ frozen suite of 100 seeded episodes that every recipe replays identically.
 - **Safety and success decouple.** Capping the demonstration labels below the safety limit removed 32–45 %
   step rejections entirely (safety 0.00 → 0.46–0.99) and changed success by nothing (0.20 → 0.20, p = 1): the
   wrapper had been bounding safety, not success. Report both, never one.
+- **A null on the nominal suite can hide a real effect under a variation.** Halving the injected expert
+  noise left the nominal learning curve inside the noise at every checkpoint (paired +0.04, −0.04, +0.07,
+  +0.01; p 0.19–1) while the same checkpoint under a shifted camera gained +0.16 [+0.08, +0.24] (18 vs 2
+  discordant, p = 0.0004) over the azimuth-only recipe and +0.11 [+0.02, +0.20] (p = 0.035) over its own
+  nominal score. A single-condition evaluation would have filed the recipe as "no effect"; the variation
+  suite, run on the same seeds, is what made the effect visible and attributable.
 
 ## 4. Failure-Detection Taxonomy
 
