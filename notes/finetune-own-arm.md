@@ -260,7 +260,14 @@ What the bed measured against them (identical 100-seed suite, paired):
   overshoots. This is the 2607.23108 wrist-camera ablation in the expected direction and the 2606.12334
   depth-ambiguity diagnosis resolved without 3D input: at a 30 mm acceptance radius the second view, not
   more demos, less noise or viewpoint jitter, was the lever. Order of levers for a single-arm fine-tune,
-  measured: sensing ≫ data recipe (noise, jitter) ≈ 0 ≫ inference tricks.
+  measured: sensing ≫ representation updates ≫ data recipe (noise, jitter) ≈ 0 ≈ inference tricks.
+- **Unfreezing the VLM ("plastic", 7 Sep 2026) is real but small next to the sensor.** On the same single-camera
+  data and seeds, VLM + vision encoder unfrozen at lr 2.5e-5 (batch 8, float32 — float16 AdamW diverged) scored
+  0.31 [0.23, 0.41] at 7.5k against the frozen-VLM baseline's 0.16 (paired +0.15 [+0.05, +0.26], p = 0.011;
+  +0.21 against its 10k, p = 0.0001) and lifted every variation by +0.11 to +0.19, with fewer samples seen (75k
+  vs 320k). That is the Z-1 (2606.31846) argument in miniature — perception-limited failures need representation
+  updates — but the wrist camera on a *frozen* VLA bought +0.79 for the same data: at this budget a second view is
+  worth four plastic runs, and plastic-on-two-cameras is the untested combination.
 
 ## 7. Limitations
 
