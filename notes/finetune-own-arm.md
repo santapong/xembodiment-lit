@@ -215,6 +215,33 @@ The bed therefore records two σ levels and measures.
 variants can be derived at training time without breaking OXE compatibility (`lerobot/berkeley_autolab_ur5`
 is base-frame). Record both the clean label and the executed action. Report the SafeVLA quadruple.
 
+## 6d. Data levers when success is precision-limited (read 2026-09-06, verified; own bed numbers)
+
+Read on alphaXiv for the UR5e sim bed after its three recipes plateaued at 0.13–0.20 closed-loop success
+with 400 demos and a 0.03 m acceptance radius.
+
+| Paper | arXiv | Protocol | What it says for a single-camera fine-tune |
+|---|---|---|---|
+| The Curse of Precision | 2607.23108 | ManiSkill3, Diffusion Policy, > 100 training runs, 100-episode Wilson evaluations, 3 tasks with tolerance sweeps | failure rate follows a power law in demo count at fixed tolerance; demos needed grow super-exponentially as the tolerance nears a system limit c. **c is a system property**: removing the wrist camera 2.35 → 3.85 mm; a cleaner (less ambiguous, lower-raw-success) expert 2.35 → 1.27 mm; less task randomisation → 1.00 mm |
+| Geometric Entropy | 2606.20871 | DP and π0.5 on ManiSkill3 (StackCube, PegInsertionSide), ACT on a real arm, controlled trajectory-shape diversity | shape diversity in demos is inverted-U for from-scratch policies and **monotonically harmful when fine-tuning a pre-trained VLA** — the prior already carries coverage, injected diversity reads as conflicting modes |
+| Beyond Viewpoint Generalization | 2603.26757 | DP and a LoRA-tuned π0 on RoboTwin 2.0, 12 tasks, 50 rollouts per cell, cameras at 1.70 m / 45° elevation, azimuth steps of 10° | multi-view demos raise success even at the fixed training view; the useful range is ±10°–±40° azimuth with 4–8 added views, ±50–60° hurts; gains persist after single-view data saturates; a real Franka Lego task went 5 % (monocular) → 65 % with synthesized ±10°/±20° views |
+| Z-1 | 2606.31846 | GRPO post-training of π0.5 on 24 RoboCasa tasks (public demos only) | RL after SFT +13.2 points (67.4 → 80.6); precision-heavy categories gained most (drawer 83 → 96, sink 63 → 94); perception-limited tasks needed the VLM unfrozen. Cost: thousands of rollouts |
+| Fourier features for precision | 2606.12334 | point-cloud encoders, RoboCasa / ManiSkill3 / real KUKA, 5 seeds | the RGB-only depth-ambiguity diagnosis; the fix (Fourier-mapped point clouds) needs 3D input |
+
+What the bed measured against them (identical 100-seed suite, paired):
+
+- Headroom in the labels (0.7 × the safety limit) removed every cap rejection and moved success by nothing
+  (0.20 → 0.20, p = 1) — the cap was not the precision limit.
+- Camera **azimuth** jitter ±20° did not help a translated test camera (0.05 vs 0.04); camera **translation**
+  jitter ±0.20 m did (0.13 vs 0.05, +0.08 [+0.01, +0.15]) and made the policy invariant inside the jittered
+  range (nominal 0.09 vs shifted 0.13, p = 0.34) but not beyond it (0.30 m shift: 0.06 for every recipe,
+  0.03 / 0.04 / 0.06, all p ≥ 0.5) — the perturbation family must match, and it does not extrapolate.
+- Nominal success stayed inside ±8 points across all three recipes: viewpoint diversity is not a precision lever.
+- Tolerance sweeps (§3b of `evaluation-and-failure.md`) show the failures are centimetre misses, which puts the
+  remaining levers where 2607.23108 puts them: expert clarity (less injected noise — recipe v5a, 0.25 × noise,
+  in progress), a wrist camera (recipe v6), and a DAgger round with the privileged oracle (v7). RL post-training
+  (Z-1) is out of the $0 budget: ≈ 30 s per rollout on a T4 makes one GRPO round ≈ 10 Kaggle sessions.
+
 ## 7. Limitations
 
 - No paper in this set publishes a single, apples-to-apples GPU-hour

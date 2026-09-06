@@ -32,6 +32,33 @@ Three compounding problems:
 - **Real-to-sim correlation itself needs a statistical vocabulary**, not just "does it look right." SimplerEnv formalizes two metrics for judging any proxy evaluation against ground-truth real trials: Pearson correlation r (rank/trend agreement) and **Mean Maximum Rank Violation (MMRV)** (2405.05941, §III) — reused by AutoEval to show AutoEval (r=0.942, MMRV=0.015) beats SIMPLER (r lower, MMRV higher) as a real-world proxy (2503.24278, §5.2).
 - **Crowd-sourced pairwise comparison converges fast but needs its own bias controls.** RoboArena's ranking accuracy (vs. an oracle built from 4284 exhaustive comparisons) saturates within ~100 pairwise episodes — matching the sample-efficiency of conventional fixed-task batch evaluation while giving broader task/scene coverage — but flags Goodhart's-law over-optimization risk once evaluation becomes a training target, and notes it has not tested robustness to adversarial evaluators (2506.18123, §5.3, §7).
 
+## 3b. What a 100-episode sim suite actually resolves (own bed, measured 4–6 Sep 2026, verified)
+
+Numbers from the UR5e sim bed in `santapong/RoboLLM` (`sim/vla-bed`, branch `experiment/ur5e-vla-bed`,
+report `results/REPORT-2026-09-06.md`): SmolVLA fine-tuned on 400 scripted demos, scored closed-loop on a
+frozen suite of 100 seeded episodes that every recipe replays identically.
+
+- **Unpaired Wilson intervals at n = 100 are ±8 points wide** at success rates of 0.1–0.3; a learning curve of
+  0.09 / 0.13 / 0.20 / 0.13 over four checkpoints is flat inside them. **Pairing on identical seeds** (discordant
+  pairs, exact McNemar, paired bootstrap) resolved differences of 8–11 points that the marginal intervals
+  could not: gain-probe vs nominal +0.11 [+0.04, +0.18], p = 0.007 (11 vs 3 discordant of 100); camera-jitter
+  recipe vs its predecessor under a shifted camera +0.08 [+0.01, +0.15], p = 0.057. Two recipes that both score
+  0.20 unpaired gave 15 vs 15 discordant pairs (p = 1): "equal" was a real finding, not a failure to resolve.
+  This is the cheap end of the 2605.29710 arithmetic above — pairing costs nothing when the evaluator is seeded.
+- **A tolerance sweep separates "misses by centimetres" from "goes the wrong way".** Re-thresholding the per-episode
+  minimum distance at acceptance radii 0.03 → 0.10 m raised every recipe's success three- to fourfold by 0.06 m
+  (0.12 → 0.46 → 0.71 at 0.10 m for the final checkpoint); an out-of-range camera view gave a flatter curve
+  (0.06 → 0.17 → 0.42). The curve is right-censored at the suite's own radius (episodes stop at success) and must
+  say so. This is the diagnostic 2607.23108 builds its precision scaling law on (failure rate ∝ N^a at fixed
+  tolerance; data need grows super-exponentially as the tolerance approaches a system limit c).
+- **Success needs a dwell, and the dwell hides a mode.** Counting episodes that *ever* entered the radius
+  exceeded the suite's success (five consecutive frames) by 3–12 points; the gap was largest for a policy-side
+  clip of the commands (0.19 held vs 0.31 reached), i.e. the clip made the arm reach and jitter out again. A
+  binary success metric would have called the clip "no effect".
+- **Safety and success decouple.** Capping the demonstration labels below the safety limit removed 32–45 %
+  step rejections entirely (safety 0.00 → 0.46–0.99) and changed success by nothing (0.20 → 0.20, p = 1): the
+  wrapper had been bounding safety, not success. Report both, never one.
+
 ## 4. Failure-Detection Taxonomy
 
 | signal source | representative papers | reported detection metric | latency / overhead |
@@ -153,6 +180,8 @@ H5's hypothesis: detect policy failure by comparing what the policy **commanded*
 
 All fetched via alphaXiv `answer_pdf_queries`; full bib entries in `paper/bib-eval.bib`.
 
+- Curse of Precision (data scaling law for high-precision manipulation) — 2607.23108
+- Own UR5e sim bed (paired suites, tolerance sweeps) — github.com/santapong/RoboLLM sim/vla-bed, `results/REPORT-2026-09-06.md`
 - LIBERO — 2306.03310
 - SimplerEnv — 2405.05941
 - CALVIN — 2112.03227
