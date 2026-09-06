@@ -64,6 +64,11 @@ frozen suite of 100 seeded episodes that every recipe replays identically.
   discordant, p = 0.0004) over the azimuth-only recipe and +0.11 [+0.02, +0.20] (p = 0.035) over its own
   nominal score. A single-condition evaluation would have filed the recipe as "no effect"; the variation
   suite, run on the same seeds, is what made the effect visible and attributable.
+- **The tolerance sweep predicted which lever would move the ceiling.** Success rose three- to fourfold
+  between 0.03 and 0.06 m for every single-camera recipe (centimetre misses, not wrong directions), which
+  put the remaining levers on sensing and label clarity rather than demo count. Lower expert noise did
+  nothing (above); a wrist camera moved the frozen-suite success from 0.10 to 0.89 with 79 vs 0 discordant
+  pairs. A diagnostic that ranks levers before spending compute is worth more than another seed.
 
 ## 4. Failure-Detection Taxonomy
 

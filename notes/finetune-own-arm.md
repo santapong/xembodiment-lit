@@ -251,6 +251,16 @@ What the bed measured against them (identical 100-seed suite, paired):
   the best score under the shifted test camera (0.21 vs 0.13 at 0.5 × noise, +0.08 [0.00, +0.16], p = 0.077;
   vs the azimuth-only recipe +0.16 [+0.08, +0.24], p = 0.0004), an effect the nominal suite alone would have
   missed.
+- **The wrist camera was the ceiling (recipe v6, 6–7 Sep 2026).** Adding an eye-in-hand 224² stream to the
+  v5a recipe — identical seeds, labels and physics, 1.8 × the training compute — moved the frozen-suite
+  success from 0.10 to **0.89** [0.81, 0.94] (paired +0.79 [+0.71, +0.87], 79 vs 0 discordant, McNemar
+  p = 3 × 10⁻²⁴); every checkpoint from 2.5k (0.80) beats every single-camera number, and the variations
+  follow (shifted camera 0.86, lighting 0.85, relocated target 0.90, far camera 0.75, blank image 0.05).
+  The gain probe that helped every single-camera recipe now hurts (0.75, p = 0.004): the policy no longer
+  overshoots. This is the 2607.23108 wrist-camera ablation in the expected direction and the 2606.12334
+  depth-ambiguity diagnosis resolved without 3D input: at a 30 mm acceptance radius the second view, not
+  more demos, less noise or viewpoint jitter, was the lever. Order of levers for a single-arm fine-tune,
+  measured: sensing ≫ data recipe (noise, jitter) ≈ 0 ≫ inference tricks.
 
 ## 7. Limitations
 
